@@ -1,0 +1,109 @@
+<!doctype html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width; initial-scale=1.0 , user-scalable=false">
+
+<script>
+var words = [ ['ㄅ','bp'],['ㄍ','kg'],['ㄗ','ts'],['ㄘ','ch'],['ㄖ','j'],['ㄥ','ng'],['ㄆ','p'],['ㄇ','m'],
+              ['ㄏ','h'],['ㄉ','d'],['ㄊ','t'],['ㄋ','n'],['ㄌ','l'],['ㄎ','k'],['ㄙ','s'],['鵝','g'],['無','b'],
+              ['ㄚ','a'],['ㄧ','i'],['ㄨ','u'],['ㄝ','e'],['ㄜ','o'],['ㄛ','oo'] ];
+
+var ctx; var canvas;
+var str = ""; var cat = 0; var correct = 0; var errcount = 0;
+var ranword; var c; var ran;
+var count = words.length;
+//傳回字佮伊的台羅音array
+function getRandomWord() {      //ran對float轉做int     加1才增加範圍
+  ran = Math.floor(Math.random() * count);
+  return [words[ran][0], words[ran][1]];
+}
+
+
+function setZero() {      //設0的函數
+  correct=0; errcount =0;
+  document.getElementById('correct').innerHTML = correct;
+  document.getElementById('error').innerHTML = errcount;
+}
+
+function reNew() {
+  ctx.clearRect(0, 0, 400, 100);
+  ranword = getRandomWord();
+  ctx.fillText(ranword[0], 70, 70, 200);
+}
+
+function onSpace() {
+  c = event.which;
+  if ( c == 13 || c == 32) {
+    if (str == ranword[1]) {
+      correct ++;
+      document.getElementById('correct').innerHTML = correct;
+      for (var j=ran; j<count; j++) {
+        words[j] = words[j+1];  //向頭前捒減一个
+      }
+      count = count - 1;
+      if (count <= 0) {
+        alert("完成");
+        return;
+      }
+      reNew();
+    }
+    else {      //拍毌著矣,無換字
+      errcount ++;
+      document.getElementById('error').innerHTML = errcount;
+    }
+    str = ""; //拍著毋著攏愛清掉已拍的字
+  }
+  else {
+    str = str + String.fromCharCode(event.which).toLowerCase();
+  }
+  document.getElementById('txt').innerHTML = str + '|';
+}
+
+</script>
+
+
+</head>
+<body onkeydown="onSpace()">
+<h2 align="center" style="color:darkred">拼第1關</h2>
+<div>秒數<input id="count" type="text" style="text-align:right"><span id="tlabel">0</span></input><button type="submit" onclick="start()">start</button></div>
+
+<div style="text-align:center">
+
+<div><span id="error" style="color:red">0</span>
+<canvas id="label" width="200" height="120" font="2em"></canvas>
+<span id="correct" style="color:green">0</span>
+</div>
+<button type="button" id="txt" style="width: 5rem" disabled>|</button>
+</div>
+<div id="comment" style="color:gray">
+<br><br>
+</div>
+
+<script>
+  canvas = document.getElementById("label");   //4條初始化做一遍就好
+  ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgb(0,255, 0)";
+  ctx.font = "Italic 3em Sans-Serif";
+  ctx.strokeStyle = "rgb(0, 0, 0)";
+  ctx.strokeWidth = 1;
+  ctx.shadowOffsetY = 3;
+  //  ctx.strokeRect(0, 100, 200, 8);
+  ranword = getRandomWord();
+  ctx.fillText(ranword[0], 70, 70, 200);
+
+  var rcount = 0, count = 0;
+  function showTime() {
+    count--;
+    document.getElementById('tlabel').innerHTML = count;
+
+    //if (count%30==0) alert('tick');
+  }
+
+  function start() {
+    count = document.getElementById('count').value;
+    document.getElementById('count').disabled = true;
+    window.setInterval(showTime, 1000);
+  }
+</script>
+
+</body></html>

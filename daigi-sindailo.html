@@ -1,0 +1,141 @@
+
+<!-- saved from url=(0044)http://www.hkjh.cyc.edu.tw/common/taigi.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width; initial-scale=1.0 , user-scalable=false">
+
+<script>
+var words = [ ['ㄅ','bp'],['ㄍ','kg'],['ㄗ','ts'],['ㄘ','ch'],['ㄖ','j'],['ㄥ','ng'],['ㄆ','p'],['ㄇ','m'],
+              ['ㄏ','h'],['ㄉ','d'],['ㄊ','t'],['ㄋ','n'],['ㄌ','l'],['ㄎ','k'],['ㄙ','s'],['鵝','g'],['無','b'],
+              ['ㄚ','a'],['ㄧ','i'],['ㄨ','u'],['ㄝ','e'],['ㄜ','o'],['ㄛ','oo'],
+
+              ['ㄞ', 'ai'] ,['ㄠ', 'au'],['ㄢ', 'an'], ['ㄤ', 'ang'],['餡', 'ann'],
+
+              ['衫', 'sann1'], ['短', 'de2'], ['褲', 'koo3'],  ['人', 'lang5'], ['矮', 'e2'],
+              ['鼻', 'pinn7'],
+              ['君', 'kgun1'], ['滾', 'kgun2'], ['棍', 'kgun3'],  ['裙', 'kgun5'], ['滾', 'kgun2'],
+              ['郡', 'kgun7'],
+              ['獅', 'sai1'], ['虎', 'hoo2'], ['豹', 'bpa3'],  ['猴', 'kgau5'], ['狗', 'kgau2'],
+              ['象', 'chiunn7'],
+              ['詩', 'si1'], ['始', 'si2'], ['四', 'si3'],  ['時', 'si5'], ['死', 'si2'],
+              ['是', 'si7'],
+
+              ['闊', 'kuah4'],['直', 'dit8'],['骨', 'kgut4'],['滑', 'kgut8'],['鱉', 'bpih4'],
+              ['鹿', 'lok8'],['爍', 'sih4'],['翼', 'sit8'],
+              ['遏','at4'],['活','uah8'],['惡','ok4'],['億','ik4'], ['浴', 'ik8'], ['壓', 'ap4'],
+              ['盒','ap8'],['約','iok4'],['育','iok8'],['鴨','ah4'],['曷', 'ah8']['沃','ak4'],
+              ['斡','uat4'],['越','uat8'], ['哎','aih4'],['乙','it4'],['擛','iat8'] ];
+
+var catalogs = [ ['4个新台羅音', 0, 5], ['新台羅23个符號', 0, 22],['韻母複合音',23 ,27], ['台語8音調練習', 28, 51], ['入音練習', 52, 77] ];
+var ctx; var canvas;
+var str = ""; var cat = 0; var correct = 0; var errcount = 0;
+var ranword; var c; var ran;
+
+//傳回字佮伊的台羅音array
+function getRandomWord(cat) {      //ran對float轉做int     加1才增加範圍
+  ran = Math.floor(Math.random()*( catalogs[cat][2] - catalogs[cat][1] + 1 ) + catalogs[cat][1]);
+  return [words[ran][0], words[ran][1] ];
+}
+
+function setZero() {      //設0的函數
+  correct=0; errcount =0;
+  document.getElementById('correct').innerHTML = correct;
+  document.getElementById('error').innerHTML = errcount;
+}
+
+
+function chooseCat() {   //換單元的時，隨改做0
+  setZero();
+  cat = document.getElementById("cat").value;
+  reNew();
+  document.getElementById('comment').style.visibility = "hidden";
+  document.getElementById('cat').disabled = true;
+  window.setInterval(showTime, 1000);
+}
+
+function reNew() {
+  str = "";
+  ctx.clearRect(0, 0, 400, 100);  //愛清掉畫新的才袂重
+  ranword = getRandomWord(cat);
+  ctx.fillText(ranword[0], 70, 70, 200);
+}
+
+function onSpace() {
+  c = event.keyCode;
+  str = document.getElementById('txt').value.toLowerCase();
+//  if ( c == 32) {   //空白無算佇字串長度內面，但是處理了煞出佇輸入格內面
+//    c = 13;
+//    (event.charCode);   //用來食掉空白，怪怪的辦法
+//  }
+  if (str == ' ') {
+    str = '';
+    document.getElementById('txt').value = '';
+  }
+
+  if ( c == 13 || c == 32) {
+    if (str == ranword[1]) {
+      correct ++;
+      document.getElementById('correct').innerHTML = correct;
+      reNew();
+    }
+    else {      //拍毌著矣,無換字
+      str = "";
+      errcount ++;
+      document.getElementById('error').innerHTML = errcount;
+    }
+    document.getElementById('txt').value = "";
+  }
+}
+
+var count = 600;
+function showTime() {
+  document.getElementById('tlabel').innerHTML = count;
+  count--;
+  if (count == 0) alert('End');
+}
+
+</script>
+
+
+</head>
+<body>
+<h2 align="center" style="color:darkred">新台羅拼音 練習</h2>
+<div id="tlabel" style="text-align:right"></div>
+<div style="text-align:center">
+<select name="cat" id="cat" onchange="chooseCat()">
+  <option value="0">6个新台羅音</option>
+  <option value="1">新台羅聲韻母</option>
+  <option value="2">韻母複合音</option>
+  <option value="3">台語8音調練習</option>
+  <option value="4">入音練習</option>
+</select>
+
+<div><span id="error" style="color:red">0</span>
+<canvas id="label" width="200" height="120" font="2em"></canvas>
+<span id="correct" style="color:green">0</span>
+</div>
+<div><input type="text" id="txt" size="12" onkeydown="onSpace();"></div>
+
+</div>
+<div id="comment" style="color:gray">
+<br><br>
+
+</div>
+
+<script>
+  canvas = document.getElementById("label");   //4條初始化做一遍就好
+  ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgb(0,255, 0)";
+  ctx.font = "Italic 3em Sans-Serif";
+  ctx.strokeStyle = "rgb(0, 0, 0)";
+  ctx.strokeWidth = 1;
+  ctx.shadowOffsetY = 3;
+//  ctx.strokeRect(0, 100, 200, 8);
+ranword = getRandomWord(cat);
+ctx.fillText(ranword[0], 70, 70, 200);
+
+</script>
+
+
+
+</body></html>

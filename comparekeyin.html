@@ -1,0 +1,238 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+<title>parse token</title>
+<script>
+   var tokens = new Array(); var line_tokens = new Array();
+   var cur_line = 0; var cur_token = 0;
+   var right =0; var wrong =0; var sum = 0;
+function loadDoc() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      strToToken(this.responseText);
+      origin.innerHTML = tokens[line];
+    }
+  };
+  xhttp.open("GET", "ajax_info_1.txt", true);
+  xhttp.send();
+}
+
+function strToToken(str) {
+  for (var j=0; j<str.length; j++) {
+    var token = '';
+    while (str[j] != '\n') {
+      if (str[j] == ' ') {
+        line_tokens.push(token);
+        token = '';
+      }
+      else {
+        token = token + str[j];
+      }
+      j++;
+    }
+    line_tokens.push(token);
+    tokens.push(line_tokens.slice());
+    line_tokens = [];
+  }
+}
+
+var line = 0;
+
+    var cArr = new Array(); var cur = 0, front = 0;
+    var tones = [2, 3, 5, 7, 8]; var mothers = ['a', 'e', 'o', 'i', 'u'];
+    var a = ["á", "à", "â", "ā", "a̍"],
+        e = ["é", "è", "ê", "ē", "e̍"],
+        o = ["ó", "ò", "ô", "ō", "o̍"],
+        i = ["í", "ì", "î", "ī", "i̍"],
+        u = ["ú", "ù", "û", "ū", "u̍"],
+        n = ["ń", "ǹ", "n̂", "n̄", "n"],
+        m = ["ḿ", "m", "m", "m̄", "m"];
+    var rel = {'2': 0, '3': 1, '5': 2, '7': 3, '8': 4};  //調號關連到array
+    var strtofunc = {'a': a, 'e': e, 'o': o, 'i': i, 'u': u };
+    var ntofunc   = {'n': n}; var mtofunc = {'m': m};
+    var token_len = 5;
+    var key;
+
+    function getString(start, end) {
+      var str = '';
+      for (var j = start; j < end; j++) {
+        str = str.concat(cArr[j]);
+      }
+      return str;
+    }
+
+    function getStrToken(str, curr) {
+      while (str.charAt(curr) == ' ' && curr > 0) {
+        curr--;
+      }
+      var tail = curr;
+      while (str.charAt(curr)!= ' ' && curr > 0) {
+        curr--;
+      }
+      return str.substring(curr, tail + 1);
+    }
+
+    function subStr(curr) {
+      substr = '';
+      if ( (curr - token_len) < 0) substr = cArr.slice(0, curr);
+      else substr = cArr.slice(curr - token_len, curr);  // at most 5
+      return substr.join('');  //join 用''連接每一个元素
+    }
+
+    function getPreToken(curr) {
+      var token = ''; var j ;
+
+      for (j = curr-1; j >= 0; j--) {
+        if (cArr[j] == ' ') break;
+      }
+      token = cArr.slice(j+1, curr);
+      return token.join('');
+    }
+
+    function isTokenEqual(t1, t2) {
+      if (t1 == t2) return true;
+      else return false;
+    }
+
+    function getMoIndex(arr) {  //if no mother letter , return length of arr
+      var count = 0;
+      for (var j = 0; j < arr.length; j++) {
+        if (isMother(arr[j])) {
+          if ( arr[j] == 'a' || arr[j] == 'e' || arr[j] == 'o') {
+            return count;
+          }
+          else {  //i, u
+            if (isMother(arr[j+1])) return count+1;
+            else return count;
+          }
+        }
+        else count++;
+      }
+      return count;
+    }
+
+    function getTokenMoIndex(curr) {
+      var substr = subStr(curr);
+      var len = substr.length;
+      var index = substr.indexOf(' ');
+      substr = substr.slice(index+1);
+      return curr - len + index + 1 + getMoIndex(substr);
+    }
+
+    function isTone(key) {
+      for (var j = 0; j < tones.length; j++) {
+        if (key == tones[j]) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function isMother(key) {
+      for (var j = 0; j < mothers.length; j++) {
+        if (key == mothers[j]) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+
+    document.onkeypress = function(event) {
+      if (event.keyCode >= 32 && event.keyCode <= 127) {
+        key = String.fromCharCode(event.keyCode);
+
+        var num = getTokenMoIndex(cur);
+if (key == ' ') {
+  if (isTokenEqual(tokens[cur_line+1][cur_token], getPreToken(cur))) {
+    right++; document.getElementById('right').innerHTML = right;
+  }
+  else {
+    wrong++; document.getElementById('wrong').innerHTML = wrong;
+    alert(tokens[cur_line+1][cur_token]);
+  }
+  //document.getElement.getElementById('sum').innerHTML = right + wrong;
+  cur_token++;
+}
+        if ( isTone(key) && num < cur) {  //本字母有tone數字
+          cArr[num] = strtofunc[cArr[num]][rel[key]];
+        }
+        else {
+          if (isTone(key) && subStr(cur).indexOf('ng') >= 0) {
+            var len = subStr(cur).length;
+            var loc = cur - (len - subStr(cur).indexOf('ng'));
+            cArr[loc] = ntofunc[cArr[loc]][rel[key]];
+          }
+          else if (isTone(key) && (subStr(cur) == 'm' || subStr(cur).indexOf(' m') >=0)) {
+            var len = subStr(cur).length;
+            var loc = cur - (len - subStr(cur).indexOf(' m'));
+            cArr[loc+1] = mtofunc[cArr[loc+1]][rel[key]];
+          }
+          else {
+            cArr.splice(cur, 0, key);
+            front++; cur++;
+          }
+        }
+      }
+      else return;
+      str.value = getString(0, cur) + '|' + getString(cur, front);
+    }
+
+    document.onkeydown = function(event) {
+      if (event.keyCode == 8) {
+        if (cur >= 1 && cArr[cur-1]!= ' ') {
+          cArr.splice(cur-1, 1);
+          cur--; front--;
+        }
+      }
+      else if (event.keyCode == 37) { // left arrow
+          if (cur >= 1) cur--;
+      }
+      else if (event.keyCode == 39) { //right arrow
+        if (cur < front) cur++;
+      }
+      else if (event.keyCode == 13) {  //4逝token徒來
+        line = line + 2;    //undefined 毋免加引號
+        if (tokens[line] == undefined) alert("已結束");
+        else origin.innerHTML = tokens[line];
+        cur_line += 2; cur_token = 0;
+
+        cur = 0; front = 0;
+      }
+      str.value = getString(0, cur) + '|' + getString(cur, front);
+    }
+
+    var mystr = new Array();
+
+    var lines = 0;
+    function strToArr(str) {
+      var cur = 0; tempsub = '';
+      do {
+        tempsub = str.substring(cur, str.indexOf('\n'));
+        mystr.push(tempsub);
+        lines ++;
+        str = str.substring(str.indexOf('\n') + 1);
+      } while (str.length != 0);
+
+    }
+
+  </script>
+
+  </head>
+  <body><span style="color: orange">瀏覽器執行台羅音一逝編輯器</span><br><div style='color: blue; font-size: 24px;' id='demo'></div>
+  <div id="origin"></div>
+  <textarea id="str" style="font-size: 24px; border: 2px solid #336600;color:#800000;"
+  disabled rows="1" cols="50">sin dâi lô tsi̍ tsuā bpian tsi̍p kgì|</textarea><br>
+  <span style="color: blue">正確：<span style="color:green" id="right">0</span>
+  錯誤：<span style="color:red" id="wrong">0</span>
+  合計：<span style="color:blue" id="sum">0</span>
+  <span>按空白鍵後就無法往前刪字</span>
+</span>
+  <script>
+    var origin = document.getElementById("origin");
+    loadDoc();
+
+  </script>
+</body>
+</html>

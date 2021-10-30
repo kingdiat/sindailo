@@ -1,0 +1,100 @@
+<!doctype html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width; initial-scale=1.0 , user-scalable=false">
+
+<script>
+var words = [ ['獅','sai1'],['虎','hoo2'],['豹','bpa3'],['𤠣','kgau5'],['敗','bpai7'],['四','si3'],['時','si5'],['滾','kgun2'],
+              ['棍','kgun3'],['短','de2'],['褲','koo3'],['人','lang5'],['泡','pau3'],['麻','mua5'], ['桶', 'tang2'],
+              ['貓','niau1'], ['找','tsau7'], ['車','chia1'], ['嚷','giang2'], ['䆀','bai2'], ['癮','gian3'],
+              ['傲','ngoo7'], ['賤','tsian7'] ];
+
+var ctx; var canvas;
+var str = ""; var cat = 0; var correct = 0; var errcount = 0;
+var ranword; var c; var ran;
+var count = words.length;
+//傳回字佮伊的台羅音array
+function getRandomWord() {      //ran對float轉做int     加1才增加範圍
+  ran = Math.floor(Math.random() * count);
+  return [words[ran][0], words[ran][1]];
+}
+
+
+function setZero() {      //設0的函數
+  correct=0; errcount =0;
+  document.getElementById('correct').innerHTML = correct;
+  document.getElementById('error').innerHTML = errcount;
+}
+
+function reNew() {
+  ctx.clearRect(0, 0, 400, 100);
+  ranword = getRandomWord();
+  ctx.fillText(ranword[0], 70, 70, 200);
+}
+
+function onSpace() {
+  c = event.which;
+  if ( c == 13 || c == 32) {
+    if (str == ranword[1]) {
+      correct ++;
+      document.getElementById('correct').innerHTML = correct;
+      for (var j=ran; j<count; j++) {
+        words[j] = words[j+1];  //向頭前捒減一个
+      }
+      count = count - 1;
+      if (count <= 0) {
+        alert("完成");
+        return;
+      }
+      reNew();
+    }
+    else {      //拍毌著矣,無換字
+      errcount ++;
+      document.getElementById('error').innerHTML = errcount;
+    }
+    str = ""; //拍著毋著攏愛清掉已拍的字
+  }
+  else {
+    str = str + String.fromCharCode(event.which).toLowerCase();
+  }
+  document.getElementById('txt').innerHTML = str + '|';
+}
+
+function showTime() {
+  document.getElementById('tlabel').innerHTML = count;
+  count--;
+  if (count == 0) alert('End');
+}
+</script>
+
+
+</head>
+<body onkeydown="onSpace()">
+<h2 align="center" style="color:darkred">拼第4關</h2>
+<div id="tlabel" style="text-align:right"></div>
+<div style="text-align:center">
+
+<div><span id="error" style="color:red">0</span>
+<canvas id="label" width="200" height="120" font="2em"></canvas>
+<span id="correct" style="color:green">0</span>
+</div>
+<button type="button" id="txt" style="width: 5rem">|</button>
+</div>
+<div id="comment" style="color:gray">
+<br><br>
+</div>
+
+<script>
+  canvas = document.getElementById("label");   //4條初始化做一遍就好
+  ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgb(0,255, 0)";
+  ctx.font = "Italic 3em Sans-Serif";
+  ctx.strokeStyle = "rgb(0, 0, 0)";
+  ctx.strokeWidth = 1;
+  ctx.shadowOffsetY = 3;
+  //  ctx.strokeRect(0, 100, 200, 8);
+  ranword = getRandomWord();
+  ctx.fillText(ranword[0], 70, 70, 200);
+</script>
+
+</body></html>

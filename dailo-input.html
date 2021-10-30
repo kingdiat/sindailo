@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width; initial-scale=1.0 , user-scalable=false">
+
+<script>
+var ch = [ ' ', '\n', '\b', 'a', 'e', 'o', 'i', 'u', 'b', 'c', 'd', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 's', 't', '2', '3', '5', '7', '8' ];
+var art = [];
+
+
+</script>
+
+
+</head>
+<body onkeypress="onSpace()">
+<h2 align="center" style="color:darkred">新台羅輸入法</h2>
+<div id="comment" style="color:gray">
+  <label id="mytext">｜</label>
+<br><br>
+</div>
+
+<script>
+var text = document.getElementById('mytext');
+
+function onSpace() {
+  //var c = String.fromCharCode(event.charCode);
+  var c = String.fromCharCode(event.which);
+  art.push(c);
+  var str = '';
+  for (var j=0; j<art.length; j++) {
+    str = str + art[j];
+  }
+  text.innerHTML = str + '|';
+}
+
+</script>
+
+</body></html>
